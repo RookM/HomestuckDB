@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
-const Character = require("./models/characterModel");
-const Ship = require("./models/shipModel");
-const { constants } = require("./constants");
+const Character = require("../models/characterModel");
+const Ship = require("../models/shipModel");
+const { constants } = require("../constants");
 
 const characterList = [];
 const shipList = [];
@@ -53,6 +53,25 @@ function createShip(characterOne, characterTwo) {
   }
 };
 
+//@desc Get All Names
+//@route GET /api/user/
+//@access public
+const getNameList = asyncHandler(async (req, res) => {
+  let charIndex = 0;
+
+  const allCharacters = await Character.find({});
+  allCharacters.forEach(character => {
+    characterList[charIndex] = character.first_name;
+    charIndex++;
+  });
+
+  const jsonString = JSON.stringify(characterList);
+  res.status(200).json(jsonString);
+});
+
+//@desc Create All Ships
+//@route POST /api/setup/
+//@access public
 const createAllShips = asyncHandler(async (req, res) => {
   let charIndex = 0;
   let shipIndex = 0;
@@ -73,13 +92,16 @@ const createAllShips = asyncHandler(async (req, res) => {
     for (let charactersY = (charactersX + 1); charactersY < characterList.length; charactersY++) {
       let namePair = characterList[charactersX].first_name + characterList[charactersY].first_name;
       let namePairFlipped = characterList[charactersY].first_name + characterList[charactersX].first_name;
-      const shipExists = await Ship.exists({ ship_name: namePair });
-      const shipFlippedExists = await Ship.exists({ ship_name: namePairFlipped });
+      let shipExists = await Ship.exists({ ship_name: namePair });
+      let shipFlippedExists = await Ship.exists({ ship_name: namePairFlipped });
       if (!shipExists && !shipFlippedExists) {
         createShip(characterList[charactersX], characterList[charactersY]);
       }
     }
   }
+
+  const jsonString = JSON.stringify(shipList.length);
+  res.status(200).json(jsonString);
 });
 
-module.exports = { createAllShips };
+module.exports = { getNameList, createAllShips };
