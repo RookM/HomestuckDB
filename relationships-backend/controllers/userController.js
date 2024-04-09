@@ -6,6 +6,12 @@ const { constants } = require("../constants");
 //@route POST /api/user/
 //@access public
 const incrementShip = asyncHandler(async (req, res) => {
+  const origin = req.get("origin");
+  if (origin != "https://yggs.neocities.org") {
+    res.status(401);
+    throw new Error("Unauthorized: Request from Unauthorized Source");
+  }
+
   const { ship_name, quadrant } = req.body;
   // Checks if ship_name is valid
   let ship = await Ship.findOne({ ship_name });
