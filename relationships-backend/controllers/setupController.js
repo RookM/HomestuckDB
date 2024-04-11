@@ -104,4 +104,41 @@ const createAllShips = asyncHandler(async (req, res) => {
   res.status(200).json(jsonString);
 });
 
-module.exports = { getNameList, createAllShips };
+//@desc Clear All Ships
+//@route DELETE /api/setup/
+//@access public
+const clearAllShips = asyncHandler(async (req, res) => {
+
+  const allShips = await Ship.find({});
+  allShips.forEach(async (ship) => {
+    ship.flushed = 0;
+    ship.pitch = 0;
+    ship.pale = 0;
+    ship.ashen = 0;
+    ship.other = 0;
+    try {
+      await ship.save();
+      res.status(200).json(ship);
+    } catch (error) {
+      res.status(constants.INVALID_INPUT);
+      if (error.name === "ValidationError") {
+        if (error.errors.ship_name) {
+          throw new Error(error.errors.flushed.message);
+        } else if (error.errors.pitch) {
+          throw new Error(error.errors.pitch.message);
+        } else if (error.errors.pale) {
+          throw new Error(error.errors.pale.message);
+        } else if (error.errors.ashen) {
+          throw new Error(error.errors.ashen.message);
+        } else if (error.errors.other) {
+          throw new Error(error.errors.other.message);
+        }
+      }
+    }
+  });
+  
+  const jsonString = JSON.stringify(shipList.length);
+  res.status(200).json(jsonString);
+});
+
+module.exports = { getNameList, createAllShips, clearAllShips };

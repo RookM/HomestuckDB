@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { createAllShips } = require("../controllers/setupController");
+const { createAllShips, clearAllShips } = require("../controllers/setupController");
 
-router.route("/").post(createAllShips);
+router.route("/").post(createAllShips).delete(clearAllShips);
 
 module.exports = router;
